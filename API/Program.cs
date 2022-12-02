@@ -23,12 +23,12 @@ namespace API
             catch (System.Exception ex)
             {
 
-                logger.LogError(ex, "Problem migration data");
+                logger.LogError(ex, "Problem migrating data");
             }
-            // finally
-            // {
-            //     scope.Dispose();
-            // }
+            finally
+            {
+                scope.Dispose();
+            }
             host.Run();
         }
 
