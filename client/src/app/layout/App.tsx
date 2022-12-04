@@ -1,6 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { createTheme, CssBaseline } from "@mui/material";
-import { Container } from "@mui/system";
+import { Container, createTheme, CssBaseline } from "@mui/material";
 import { useState } from "react";
 import Catalog from "../../features/catalog/Catalog";
 import Header from "./Header";
@@ -10,16 +9,19 @@ function App() {
   const theme = createTheme({
     palette: {
       mode: paletteType,
+      background:{
+        default:paletteType==='light' ? '#eaeaea' : '#121212'
+      }
     },
   });
 const changeMode = ()=>{
-  setDarkMode(!darkMode)
+  setDarkMode((prevMode)=>!prevMode)
 }
   return (
     <ThemeProvider theme={theme}>
       {/*  <CssBaseline /> reset padding margin etc.. */}
       <CssBaseline />
-      <Header changeDarkMode = {changeMode}/>
+      <Header isDarkMode = {darkMode} changeMode={changeMode}/>
       <Container>
         <Catalog />
       </Container>
