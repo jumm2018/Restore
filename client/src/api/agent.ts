@@ -1,7 +1,10 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 // import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+// simulate dataloading
+const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
 axios.defaults.baseURL = "http://localhost:5000/api/";
+axios.defaults.withCredentials= true;
 // const history = useNavigate();
 const responseBody = (response: AxiosResponse) => response.data;
 const requests = {
@@ -10,8 +13,7 @@ const requests = {
   put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
   delete: (url: string) => axios.delete(url).then(responseBody),
 };
-// simulate dataloading
-const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
+
 // intercept => abfangen von errors
 axios.interceptors.response.use(
   async (response) => {
@@ -63,8 +65,14 @@ const testErrors = {
   get500Error: () => requests.get("buggy/server-error"),
   getValidationError: () => requests.get("buggy/validation-error"),
 };
+const basket = {
+  get:()=> requests.get('basket'),// in the get => We don't need to send up any parameters because it's going to be our cookie that is sent up automatically.
+  addItem: (productId: number, quantity = 1)=> requests.post(`basket?productId=${productId}&quantity=${quantity}`,{}),
+  removeItem: (productId: number, quantity = 1)=> requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
+}
 const agent = {
   Catalog,
   testErrors,
+  basket
 };
 export default agent;
