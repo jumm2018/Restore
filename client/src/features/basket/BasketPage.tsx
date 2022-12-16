@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import agent from "../../api/agent";
 import { useStoreContext } from "../../context/StoreContext";
+import { currencyFormat } from "../../util/util";
 import BasketSummary from "./BasketSummary";
 const BasketPage = () => {
   const { basket, setBasket, removeItem } = useStoreContext();
@@ -70,7 +71,7 @@ const BasketPage = () => {
                   </Box>
                 </TableCell>
                 <TableCell align="right">
-                  {(item.price / 100).toFixed(2)} €
+                  {currencyFormat(item.price)} 
                 </TableCell>
                 <TableCell align="center">
                   <LoadingButton
@@ -102,7 +103,7 @@ const BasketPage = () => {
                   </LoadingButton>
                 </TableCell>
                 <TableCell align="right">
-                  {((item.price / 100) * item.quantity).toFixed(2)} €
+                  {currencyFormat((item.price) * item.quantity)} 
                 </TableCell>
                 <TableCell align="right">
                   <LoadingButton
