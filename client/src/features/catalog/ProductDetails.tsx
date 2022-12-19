@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
   Divider,
   Grid,
@@ -5,6 +6,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -13,14 +15,23 @@ import agent from "../../api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { Product } from "../../app/models/product";
+import { useStoreContext } from "../../context/StoreContext";
 
 const ProductDetails = () => {
+  const { basket } = useStoreContext();
   // const { id } = useParams<{id: string}>() // problem with parseInt
-  const { id } = useParams() as { id: string;}
+  const { id } = useParams() as { id: string };
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  /* How many of the items does the user already have of this item inside the basket?
+   a separate loading indicator for when we do updates the quantity inside the basket or as an item */
+  const [quantity, setQuantity] = useState(0);
+  // for submitting the.Functionality to the API.
+  const [submitting, setSubmitting] = useState(false);
+  const item = basket?.items.find((i) => i.productId === product?.id);
   useEffect(() => {
-   agent.Catalog.details(parseInt(id))
+    if (item) setQuantity(item.quantity);
+    agent.Catalog.details(parseInt(id))
       .then((response) => setProduct(response))
       .catch((error) => console.log(error))
       .finally(() => setLoading(false));
@@ -68,6 +79,21 @@ const ProductDetails = () => {
             </TableBody>
           </table>
         </TableContainer>
+        <Grid container spacing={2}>
+          <Grid item xs={6} />
+          <TextField
+            variant="outlined"
+            type="number"
+            label="quantity in cart"
+            fullWidth
+            value={quantity}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <LoadingButton sx={{height: '55px'}} color='primary' size="large" variant="contained" fullWidth>
+            {item ? "Update quantity" : "Add to cart"}
+          </LoadingButton>
+        </Grid>
       </Grid>
     </Grid>
   );
