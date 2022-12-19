@@ -18,7 +18,7 @@ import { Product } from "../../app/models/product";
 import { useStoreContext } from "../../context/StoreContext";
 
 const ProductDetails = () => {
-  const { basket } = useStoreContext();
+  const { basket, setBasket, removeItem } = useStoreContext();
   // const { id } = useParams<{id: string}>() // problem with parseInt
   const { id } = useParams() as { id: string };
   const [product, setProduct] = useState<Product | null>(null);
@@ -35,7 +35,30 @@ const ProductDetails = () => {
       .then((response) => setProduct(response))
       .catch((error) => console.log(error))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, item]);
+  var handelInputChange = (event: any) => {
+    if (event.target.value >= 0) {
+      setQuantity(parseInt(event.target.value));
+    }
+  };
+  var handelUpdateCart = () => {
+    setSubmitting(true);
+    if (!item || quantity > item.quantity) {
+      const updatedQuantity = item ? quantity - item.quantity : quantity;
+      agent.basket
+        .addItem(product?.id!, updatedQuantity)
+        .then((basket) => setBasket(basket))
+        .catch((error) => console.log(error))
+        .finally(() => setSubmitting(false));
+    } else {
+      const updatedQuantity = item.quantity - quantity;
+      agent.basket
+        .removeItem(product?.id!, updatedQuantity)
+        .then(() => removeItem(product?.id!, updatedQuantity))
+        .catch((error) => console.log(error))
+        .finally(() => setSubmitting(false));
+    }
+  };
   if (loading) return <LoadingComponent message="loading product..." />;
   if (!product) return <NotFound />;
   return (
@@ -80,19 +103,30 @@ const ProductDetails = () => {
           </table>
         </TableContainer>
         <Grid container spacing={2}>
-          <Grid item xs={6} />
-          <TextField
-            variant="outlined"
-            type="number"
-            label="quantity in cart"
-            fullWidth
-            value={quantity}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <LoadingButton sx={{height: '55px'}} color='primary' size="large" variant="contained" fullWidth>
-            {item ? "Update quantity" : "Add to cart"}
-          </LoadingButton>
+          <Grid item xs={6}>
+            <TextField
+              onChange={handelInputChange}
+              variant="outlined"
+              type="number"
+              label="quantity in cart"
+              fullWidth
+              value={quantity}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <LoadingButton
+            loading={submitting}
+            disabled={item?.quantity === quantity || !item && quantity===0}
+            onClick={handelUpdateCart}
+              sx={{ height: "55px" }}
+              color="primary"
+              size="large"
+              variant="contained"
+              fullWidth
+            >
+              {item ? "Update quantity" : "Add to cart"}
+            </LoadingButton>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>
